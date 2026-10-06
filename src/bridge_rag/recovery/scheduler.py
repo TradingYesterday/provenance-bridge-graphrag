@@ -28,14 +28,23 @@ def has_successor(constraint: Constraint, plan: CompiledPlan) -> bool:
     return any(constraint.constraint_id in other.depends_on for other in plan.constraints)
 
 
-def recovery_candidates(branch: BranchState, plan: CompiledPlan, attempts: dict[str, int], limit: int) -> list[Constraint]:
+def recovery_candidates(
+    branch: BranchState,
+    plan: CompiledPlan,
+    attempts: dict[str, int],
+    limit: int,
+    *,
+    include_terminal: bool = False,
+) -> list[Constraint]:
     done = _active_ids(branch)
     ranks = topo_ranks(plan)
     ready: list[Constraint] = []
     for constraint in plan.constraints:
-        if constraint.constraint_id in done or constraint.is_terminal:
+        if constraint.constraint_id in done:
             continue
-        if not has_successor(constraint, plan):
+        if constraint.is_terminal and not include_terminal:
+            continue
+        if not constraint.is_terminal and not has_successor(constraint, plan):
             continue
         if not all(dep in done for dep in constraint.depends_on):
             continue

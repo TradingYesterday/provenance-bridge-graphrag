@@ -268,6 +268,9 @@ class EngineConfig(StrictModel):
     max_steps: int = 32
     verifier_model: str = "programmatic-v1"
     prompt_hash: str = "programmatic-v1"
+    method: str = "relation_commit"
+    semantic_backend: str = "programmatic"
+    max_api_calls: int = 16
 
 
 class RunResult(StrictModel):

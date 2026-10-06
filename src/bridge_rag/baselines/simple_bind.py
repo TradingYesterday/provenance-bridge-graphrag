@@ -1,7 +1,9 @@
-"""Simple text-bind baseline. Not available in batch 1."""
+"""Slot filling on the shared executor. It does not use B's relation-commit gate."""
 
-from bridge_rag.baselines.cog_controlled import BaselineUnavailable
+from bridge_rag.execution.engine import RunInput
+from bridge_rag.execution.methods import run_method
+from bridge_rag.schemas import RunResult
 
 
-def run(*_args, **_kwargs):
-    raise BaselineUnavailable("simple_bind is not implemented in batch 1.")
+def run(run_input: RunInput) -> RunResult:
+    return run_method("simple_bind", run_input)

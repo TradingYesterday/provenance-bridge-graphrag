@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import json
+
 from bridge_rag.backends.graph import EntityRecord, TripleRecord, norm_name
 from bridge_rag.backends.text import TextUnit
 from bridge_rag.schemas import (
@@ -234,6 +236,20 @@ def verify_graph(
         reason_code="GRAPH_SOURCE_UNKNOWN",
         semantic_checked=True,
     )
+
+
+def decision_from_model_content(content: str) -> tuple[VerificationDecision, str]:
+    try:
+        payload = json.loads(content)
+    except json.JSONDecodeError:
+        return VerificationDecision.UNKNOWN, "PARSE_ERROR"
+    if not isinstance(payload, dict):
+        return VerificationDecision.UNKNOWN, "PARSE_ERROR"
+    raw = str(payload.get("decision") or "UNKNOWN").upper()
+    if raw not in {"SUPPORTED", "CONFLICT", "UNKNOWN"}:
+        raw = "UNKNOWN"
+    reason = str(payload.get("reason") or "MODEL_DECISION")
+    return VerificationDecision(raw), reason
 
 
 def bound_names_for(entity: EntityRecord | None, term: Term, extra: list[str] | None = None) -> list[str]:

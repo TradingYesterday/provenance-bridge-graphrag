@@ -1,7 +1,5 @@
-"""Answer metrics are deferred. Do not treat a diagnostic answer as a QA score."""
+"""Answer exact match and character F1. Diagnostic answers are not a QA leaderboard."""
 
-STATUS = "not_implemented"
+from bridge_rag.evaluation.evidence import exact_match, token_f1
 
-
-def unavailable() -> None:
-    raise NotImplementedError("answer EM/F1 is not part of batch 1")
+__all__ = ["exact_match", "token_f1"]

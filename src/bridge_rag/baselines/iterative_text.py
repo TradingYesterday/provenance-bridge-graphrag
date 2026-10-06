@@ -1,7 +1,9 @@
-"""Iterative text baseline. Not available in batch 1."""
+"""Follow-up text retrieval without graph re-entry. Same executor and budget knobs."""
 
-from bridge_rag.baselines.cog_controlled import BaselineUnavailable
+from bridge_rag.execution.engine import RunInput
+from bridge_rag.execution.methods import run_method
+from bridge_rag.schemas import RunResult
 
 
-def run(*_args, **_kwargs):
-    raise BaselineUnavailable("iterative_text is not implemented in batch 1.")
+def run(run_input: RunInput) -> RunResult:
+    return run_method("iterative_text", run_input)

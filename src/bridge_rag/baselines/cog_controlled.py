@@ -1,12 +1,25 @@
-"""CoG controlled baseline. Not available in batch 1."""
+"""Controlled CoG-style notebook on the same graph and text pool.
+
+This is not a reproduction of the original global-KG CoG setup. It keeps facts,
+clues, judgments, analysis, and follow-up queries, and it does not use B's
+relation-commit rule.
+"""
+
+from bridge_rag.execution.engine import RunInput
+from bridge_rag.execution.methods import run_method
+from bridge_rag.schemas import RunResult
 
 
 class BaselineUnavailable(RuntimeError):
     pass
 
 
-def run(*_args, **_kwargs):
+def run(run_input: RunInput) -> RunResult:
+    return run_method("cog_controlled", run_input)
+
+
+def upstream_csrag(*_args, **_kwargs):
     raise BaselineUnavailable(
-        "cog_controlled is not implemented. Batch 1 only runs the oracle branch engine. "
-        "This is a controlled adaptation target, not a claim that the original CoG global-KG setup is reproduced."
+        "The pinned CS-RAG process is not executed in this repository. "
+        "See docs/UPSTREAM_AUDIT.md for the wrapper command."
     )

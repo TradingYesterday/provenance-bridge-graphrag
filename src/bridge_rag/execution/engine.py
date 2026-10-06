@@ -7,10 +7,11 @@ from dataclasses import dataclass, field
 from bridge_rag.backends.graph import EntityRecord, GraphStore, TripleRecord
 from bridge_rag.backends.text import TextStore, TextUnit
 from bridge_rag.recovery.commit import commit_text_binding, dependent_variables, revoke_variable
-from bridge_rag.recovery.extractor import extract_scripted
+from bridge_rag.backends.llm import LLMClient
+from bridge_rag.recovery.extractor import extract_scripted, extract_with_model
+from bridge_rag.recovery.verifier import decision_from_model_content, verify_graph, verify_text
 from bridge_rag.recovery.linker import link_surface
 from bridge_rag.recovery.scheduler import attempt_key, recovery_candidates, topo_ranks
-from bridge_rag.recovery.verifier import verify_graph, verify_text
 from bridge_rag.runtime.budget import BudgetLedger
 from bridge_rag.runtime.cache import cache_key
 from bridge_rag.runtime.cache import CandidateCache
@@ -60,6 +61,8 @@ class RunInput:
     data_version: str = "diag-v1"
     revoke_variable: str | None = None
     trace_path: str | None = None
+    model: LLMClient | None = None
+    retriever: object | None = None
 
 
 def _active(branch: BranchState) -> list[ProofItem]:
@@ -424,7 +427,99 @@ def graph_closure(
             progressed = True
 
 
+def _maybe_model_semantics(run, candidate, verdict, ledger, trace, branch_id, constraint_id):
+    if run.model is None or run.config.semantic_backend != "llm" or not run.config.verify_text:
+        return verdict
+    if verdict.decision is VerificationDecision.INVALID_SPAN or not verdict.direction_ok:
+        return verdict
+    system = "Judge whether the quote supports the directed relation. Return JSON with decision SUPPORTED, CONFLICT, or UNKNOWN. Do not answer the question."
+    user = (
+        f"head: {candidate.head_surface}\n"
+        f"relation: {candidate.predicate_surface}\n"
+        f"tail: {candidate.tail_surface}\n"
+        f"quote: {candidate.quote}\n"
+    )
+    response = run.model.complete_json(system=system, user=user, purpose="verify", ledger=ledger)
+    decision, reason = decision_from_model_content(response.content)
+    extract_hashes = {call.prompt_hash for call in run.model.calls if call.purpose == "extract"}
+    trace.add(
+        "model_verify",
+        branch_id=branch_id,
+        constraint_id=constraint_id,
+        purpose="verify",
+        prompt_hash=response.prompt_hash,
+        process_isolation=response.prompt_hash not in extract_hashes,
+        usage_estimated=response.usage_estimated,
+        prompt_tokens=response.prompt_tokens,
+        completion_tokens=response.completion_tokens,
+    )
+    return verdict.model_copy(
+        update={
+            "decision": decision,
+            "reason_code": reason,
+            "semantic_checked": True,
+            "verifier_model": response.model,
+            "prompt_hash": response.prompt_hash,
+        }
+    )
+
+
+def _maybe_loose_bind(run, candidate, verdict, shape: Shape):
+    if run.config.method not in {"simple_slot", "cog_notebook"}:
+        return verdict
+    if verdict.decision is VerificationDecision.INVALID_SPAN or not verdict.direction_ok:
+        return verdict
+    free = candidate.tail_surface if shape.bound_on_head else candidate.head_surface
+    if not free or free not in candidate.quote:
+        return verdict
+    reason = "SIMPLE_SLOT" if run.config.method == "simple_slot" else "COG_NOTEBOOK"
+    return verdict.model_copy(
+        update={"decision": VerificationDecision.SUPPORTED, "reason_code": reason, "semantic_checked": False}
+    )
+
+
+def _retriever_id(run: RunInput) -> str:
+    retriever = run.retriever
+    if retriever is None:
+        return "ordered"
+    embed = getattr(retriever, "embedding_model", "embed")
+    rerank = getattr(retriever, "reranker_model", "rerank")
+    return f"{embed}|{rerank}|{getattr(retriever, 'device', '')}"
+
+
+def _surface(term: Term, branch: BranchState) -> str:
+    if term.kind is TermKind.VARIABLE and term.variable_name:
+        binding = branch.bindings.get(term.variable_name)
+        return binding.canonical_name if binding is not None else ""
+    if term.kind is TermKind.LITERAL:
+        return term.literal_value or ""
+    return term.surface
+
+
+def _retrieval_query(constraint: Constraint, branch: BranchState) -> str:
+    return " ".join(
+        part
+        for part in (
+            _surface(constraint.head_term, branch),
+            constraint.predicate_text,
+            _surface(constraint.tail_term, branch),
+        )
+        if part
+    )
+
+
+def _follow_score(unit: TextUnit, constraint: Constraint, branch: BranchState) -> int:
+    score = 0
+    for binding in branch.bindings.values():
+        if binding.canonical_name and binding.canonical_name in unit.raw_text:
+            score += 2
+    if constraint.predicate_text and constraint.predicate_text in unit.raw_text:
+        score += 2
+    return score
+
+
 def _retrieve(run: RunInput, branch: BranchState, constraint: Constraint, cache: CandidateCache, ledger: BudgetLedger, trace: TraceLog) -> list[TextUnit]:
+    followup = run.config.method == "iterative_text" and branch.parent_branch_id is not None
     signature = {
         name: binding.entity_id or binding.canonical_name for name, binding in sorted(branch.bindings.items())
     }
@@ -435,15 +530,33 @@ def _retrieve(run: RunInput, branch: BranchState, constraint: Constraint, cache:
             "constraint_id": constraint.constraint_id,
             "predicate": constraint.predicate_variants,
             "bindings": signature,
-            "model": "oracle-scripted",
+            "model": run.config.method,
             "prompt_hash": run.config.prompt_hash,
             "top_k": run.config.text_top_k,
+            "followup": followup,
+            "retriever": _retriever_id(run),
         }
     )
     cached = cache.get(key)
     if cached is None:
-        units = sorted(run.texts.visible_units(), key=lambda unit: (unit.doc_index, unit.sent_index, unit.passage_id))
-        cached = [unit.passage_id for unit in units[: run.config.text_top_k]]
+        pool = list(run.texts.units if followup else run.texts.visible_units())
+        if run.retriever is not None:
+            ranked = run.retriever.rank_units(_retrieval_query(constraint, branch), pool, run.config.text_top_k)
+            cached = [item.unit.passage_id for item in ranked]
+            trace.add(
+                "rerank",
+                branch_id=branch.branch_id,
+                constraint_id=constraint.constraint_id,
+                model=getattr(run.retriever, "reranker_model", ""),
+                device=getattr(run.retriever, "device", ""),
+                scores=[item.rerank_score for item in ranked],
+            )
+        elif followup:
+            pool.sort(key=lambda unit: (-_follow_score(unit, constraint, branch), unit.doc_index, unit.sent_index, unit.passage_id))
+            cached = [unit.passage_id for unit in pool[: run.config.text_top_k]]
+        else:
+            pool.sort(key=lambda unit: (unit.doc_index, unit.sent_index, unit.passage_id))
+            cached = [unit.passage_id for unit in pool[: run.config.text_top_k]]
         cache.put(key, cached)
     else:
         ledger.note_cache_hit()
@@ -461,7 +574,13 @@ def _recover(
     trace: TraceLog,
     room: int,
 ) -> list[BranchState]:
-    ready = recovery_candidates(branch, run.plan, ledger.recoveries, run.config.max_recoveries_per_key)
+    ready = recovery_candidates(
+        branch,
+        run.plan,
+        ledger.recoveries,
+        run.config.max_recoveries_per_key,
+        include_terminal=run.config.method == "iterative_text",
+    )
     actionable: list[tuple[Constraint, Shape]] = []
     for constraint in ready:
         shape = classify(constraint, branch, run.graph)
@@ -489,12 +608,44 @@ def _recover(
     passages = _retrieve(run, branch, constraint, cache, ledger, trace)
     allowed = {unit.passage_id for unit in passages}
     extracted = extract_scripted(run.scripted, constraint.constraint_id, allowed)
+    extractor_model = "oracle-scripted"
+    extract_notes: list[str] = []
+    if not extracted and run.model is not None:
+        bound_name = shape.bound_entity.canonical_name if shape.bound_entity is not None else ""
+        if run.config.method == "cog_notebook":
+            trace.add(
+                "notebook",
+                kind="followup_query",
+                branch_id=branch.branch_id,
+                text=f"{bound_name} {constraint.predicate_text}",
+            )
+            for unit in passages:
+                trace.add("notebook", kind="fact", branch_id=branch.branch_id, passage_id=unit.passage_id, quote=unit.raw_text)
+        extracted, extract_notes, extractor_model = extract_with_model(
+            run.model,
+            constraint,
+            passages,
+            bound_name,
+            ledger,
+        )
+        extracted = [candidate for candidate in extracted if candidate.passage_id in allowed]
+    elif run.config.method == "cog_notebook":
+        bound_name = shape.bound_entity.canonical_name if shape.bound_entity is not None else ""
+        trace.add(
+            "notebook",
+            kind="followup_query",
+            branch_id=branch.branch_id,
+            text=f"{bound_name} {constraint.predicate_text}",
+        )
+        for unit in passages:
+            trace.add("notebook", kind="fact", branch_id=branch.branch_id, passage_id=unit.passage_id, quote=unit.raw_text)
     trace.add(
         "extract",
         branch_id=branch.branch_id,
         constraint_id=constraint.constraint_id,
         count=len(extracted),
-        extractor_model="oracle-scripted",
+        extractor_model=extractor_model,
+        notes=extract_notes,
     )
     if len(extracted) > run.config.max_relations_to_verify:
         trace.add(
@@ -519,6 +670,8 @@ def _recover(
             predicate=constraint.predicate_text,
             config=run.config,
         )
+        verdict = _maybe_model_semantics(run, candidate, verdict, ledger, trace, branch.branch_id, constraint.constraint_id)
+        verdict = _maybe_loose_bind(run, candidate, verdict, shape)
         trace.add(
             "verify",
             channel="text",
@@ -528,6 +681,9 @@ def _recover(
             decision=verdict.decision.value,
             reason_code=verdict.reason_code,
             semantic_checked=verdict.semantic_checked,
+            verifier_model=verdict.verifier_model,
+            prompt_hash=verdict.prompt_hash,
+            process_isolation=run.config.semantic_backend == "llm",
         )
         if verdict.decision is not VerificationDecision.SUPPORTED:
             branch.rejected_candidates.append(
@@ -605,6 +761,24 @@ def _recover(
             proof.tail_entity_id = shape.bound_entity.entity_id
             proof.head_entity_id = link.entity_id
         proof.produces_entity_id = link.entity_id
+        if run.config.method == "simple_slot":
+            proof.reason_code = "SIMPLE_SLOT"
+        elif run.config.method == "cog_notebook":
+            proof.reason_code = "COG_NOTEBOOK"
+            trace.add(
+                "notebook",
+                kind="judgment",
+                branch_id=child.branch_id,
+                variable=link.variable,
+                entity=link.canonical_name,
+                relation=constraint.predicate_text,
+            )
+            trace.add(
+                "notebook",
+                kind="analysis",
+                branch_id=child.branch_id,
+                text=f"bound {link.variable} to {link.canonical_name}; next hop uses the shared graph or text pool",
+            )
         if not run.config.allow_successor_reentry:
             if "REENTRY_DISABLED" not in child.reason_codes:
                 child.reason_codes.append("REENTRY_DISABLED")
@@ -684,6 +858,7 @@ def execute(run: RunInput) -> RunResult:
         max_steps=run.config.max_steps,
         max_active_branches=run.config.max_active_branches,
         max_recoveries_per_key=run.config.max_recoveries_per_key,
+        max_api_calls=run.config.max_api_calls,
     )
     cache = CandidateCache()
     ids = _Ids()
@@ -745,7 +920,13 @@ def execute(run: RunInput) -> RunResult:
             finished.append(branch)
             active.extend(children)
             continue
-        ready_left = recovery_candidates(branch, run.plan, ledger.recoveries, run.config.max_recoveries_per_key)
+        ready_left = recovery_candidates(
+            branch,
+            run.plan,
+            ledger.recoveries,
+            run.config.max_recoveries_per_key,
+            include_terminal=run.config.method == "iterative_text",
+        )
         if ready_left:
             active.append(branch)
             continue

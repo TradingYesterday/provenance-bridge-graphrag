@@ -6,17 +6,15 @@
 
 诊断目录由 `python scripts/run_diagnostics.py` 重放。期望看的是证明种类、来源和状态，不是只看最终城市名。
 
-## 还不能做的比较
+## 第二批对照
 
-下面的方法在本批标记为不可用：
+`execution/methods.py` 在同一执行器的拷贝上运行 Core 00 / 01 / 10 / 11、simple slot、受控 CoG notebook 和 iterative text。CoG 这里只保留事实、线索、判断、分析和后续查询，不使用 B 的关系提交门槛，也不等于原论文的全球 KG 设定。
 
-- CS-RAG upstream 的真实运行
-- Core 00 / 01 / 10 / 11 的完整模型矩阵
-- Simple text bind
-- CoG controlled
-- Iterative text
+上游 CS-RAG 进程仍然不执行。合成诊断上的配对差值不是论文结论。
 
-配置里预留了开关，但没有模型调用时不能把诊断通过写成机制成立。
+## 指标
+
+`bridge_rag.evaluation` 计算后继证据、完整支持片段、证明精度、答案 EM/F1 和 trace 里的 token。空证明的精度记为不可计算。gold 只在评价端，不进执行器。
 
 ## 进入 100–200 题之前
 
@@ -29,6 +27,3 @@
 
 `scripts/run_pilot.py` 在这些条件满足前返回非零。
 
-## 指标
-
-证据级、证明级、答案级和成本级指标留在下一批。空证明的精度不能记成满分。gold 不能由正在测试的抽取器或验证器生成。

@@ -1,7 +1,5 @@
-"""Binding metrics are deferred to the evaluation batch."""
+"""Binding agreement against an offline gold relation."""
 
-STATUS = "not_implemented"
+from bridge_rag.evaluation.evidence import score_case
 
-
-def unavailable() -> None:
-    raise NotImplementedError("binding metrics are not part of batch 1")
+__all__ = ["score_case"]

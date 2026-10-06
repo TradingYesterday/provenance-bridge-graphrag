@@ -21,5 +21,9 @@ llm:
 retrieval:
   embedding_model: sentence-transformers/all-MiniLM-L6-v2
   reranker_model: BAAI/bge-reranker-v2-m3
-  device: cpu
-  note: deterministic-lexical-v1 is the batch-1 stand-in, not the upstream cross-encoder
+  device: auto
+  coarse_k: 20
+  rerank_batch: 8
+  rerank_max_length: 512
+  fp16: true
+  note: scripts/smoke_retrieval.py loads these on CUDA when a GPU is visible. The diagnostic executor stays on ordered retrieval unless a retriever is attached.
