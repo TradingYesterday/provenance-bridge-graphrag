@@ -1,0 +1,45 @@
+{"event": "graph_access", "i": 0, "branch_id": "b0", "constraint_id": "c0", "candidate_ids": ["t_author"]}
+{"event": "verify", "i": 1, "channel": "graph", "branch_id": "b0", "constraint_id": "c0", "triple_id": "t_author", "decision": "SUPPORTED", "reason_code": "GRAPH_SOURCE_OK"}
+{"event": "commit", "i": 2, "channel": "graph", "branch_id": "b0", "constraint_id": "c0", "produces": "?author", "triple_id": "t_author"}
+{"event": "graph_access", "i": 3, "branch_id": "b0", "constraint_id": "c1", "candidate_ids": []}
+{"event": "graph_access", "i": 4, "branch_id": "b0", "constraint_id": "c1", "candidate_ids": []}
+{"event": "retrieve", "i": 5, "branch_id": "b0", "constraint_id": "c1", "cache_key": "df434e295177219249a606aa8cd52abe3b8953d570aff7926dae8d8905f77df8", "passage_ids": ["d1", "d2"]}
+{"event": "extract", "i": 6, "branch_id": "b0", "constraint_id": "c1", "count": 1, "extractor_model": "oracle-scripted"}
+{"event": "verify", "i": 7, "channel": "text", "branch_id": "b0", "constraint_id": "c1", "candidate_id": "cand-c1-0", "decision": "SUPPORTED", "reason_code": "TEXT_SUPPORTED", "semantic_checked": true}
+{"event": "link", "i": 8, "branch_id": "b0", "constraint_id": "c1", "surface": "明川大学", "notes": ["EXACT_NAME"], "entity_ids": ["diag:uni"]}
+{"event": "commit", "i": 9, "channel": "text", "branch_id": "b1", "parent_branch_id": "b0", "constraint_id": "c1", "entity_id": "diag:uni", "reranker_score": null}
+{"event": "graph_access", "i": 10, "branch_id": "b1", "constraint_id": "c2", "candidate_ids": ["t_loc"]}
+{"event": "verify", "i": 11, "channel": "graph", "branch_id": "b1", "constraint_id": "c2", "triple_id": "t_loc", "decision": "SUPPORTED", "reason_code": "GRAPH_SOURCE_OK"}
+{"event": "commit", "i": 12, "channel": "graph", "branch_id": "b1", "constraint_id": "c2", "produces": "?city", "triple_id": "t_loc"}
+{"event": "branch", "i": 13, "branch_id": "b1", "status": "COMPLETE"}
+{"event": "replay", "i": 14, "proof_ids": ["p0", "p0", "p1", "p2"], "status": "COMPLETE", "uncertain": false, "answer": "临江市"}
+{"event": "graph_access", "i": 0, "branch_id": "b0", "constraint_id": "c0", "candidate_ids": ["t_author"]}
+{"event": "verify", "i": 1, "channel": "graph", "branch_id": "b0", "constraint_id": "c0", "triple_id": "t_author", "decision": "SUPPORTED", "reason_code": "GRAPH_SOURCE_OK"}
+{"event": "commit", "i": 2, "channel": "graph", "branch_id": "b0", "constraint_id": "c0", "produces": "?author", "triple_id": "t_author"}
+{"event": "graph_access", "i": 3, "branch_id": "b0", "constraint_id": "c1", "candidate_ids": []}
+{"event": "graph_access", "i": 4, "branch_id": "b0", "constraint_id": "c1", "candidate_ids": []}
+{"event": "retrieve", "i": 5, "branch_id": "b0", "constraint_id": "c1", "cache_key": "df434e295177219249a606aa8cd52abe3b8953d570aff7926dae8d8905f77df8", "passage_ids": ["d1", "d2"]}
+{"event": "extract", "i": 6, "branch_id": "b0", "constraint_id": "c1", "count": 1, "extractor_model": "oracle-scripted"}
+{"event": "verify", "i": 7, "channel": "text", "branch_id": "b0", "constraint_id": "c1", "candidate_id": "cand-c1-0", "decision": "SUPPORTED", "reason_code": "TEXT_SUPPORTED", "semantic_checked": true}
+{"event": "link", "i": 8, "branch_id": "b0", "constraint_id": "c1", "surface": "明川大学", "notes": ["EXACT_NAME"], "entity_ids": ["diag:uni"]}
+{"event": "commit", "i": 9, "channel": "text", "branch_id": "b1", "parent_branch_id": "b0", "constraint_id": "c1", "entity_id": "diag:uni", "reranker_score": null}
+{"event": "graph_access", "i": 10, "branch_id": "b1", "constraint_id": "c2", "candidate_ids": ["t_loc"]}
+{"event": "verify", "i": 11, "channel": "graph", "branch_id": "b1", "constraint_id": "c2", "triple_id": "t_loc", "decision": "SUPPORTED", "reason_code": "GRAPH_SOURCE_OK"}
+{"event": "commit", "i": 12, "channel": "graph", "branch_id": "b1", "constraint_id": "c2", "produces": "?city", "triple_id": "t_loc"}
+{"event": "branch", "i": 13, "branch_id": "b1", "status": "COMPLETE"}
+{"event": "replay", "i": 14, "proof_ids": ["p0", "p0", "p1", "p2"], "status": "COMPLETE", "uncertain": false, "answer": "临江市"}
+{"event": "graph_access", "i": 0, "branch_id": "b0", "constraint_id": "c0", "candidate_ids": ["t_author"]}
+{"event": "verify", "i": 1, "channel": "graph", "branch_id": "b0", "constraint_id": "c0", "triple_id": "t_author", "decision": "SUPPORTED", "reason_code": "GRAPH_SOURCE_OK"}
+{"event": "commit", "i": 2, "channel": "graph", "branch_id": "b0", "constraint_id": "c0", "produces": "?author", "triple_id": "t_author"}
+{"event": "graph_access", "i": 3, "branch_id": "b0", "constraint_id": "c1", "candidate_ids": []}
+{"event": "graph_access", "i": 4, "branch_id": "b0", "constraint_id": "c1", "candidate_ids": []}
+{"event": "retrieve", "i": 5, "branch_id": "b0", "constraint_id": "c1", "cache_key": "df434e295177219249a606aa8cd52abe3b8953d570aff7926dae8d8905f77df8", "passage_ids": ["d1", "d2"]}
+{"event": "extract", "i": 6, "branch_id": "b0", "constraint_id": "c1", "count": 1, "extractor_model": "oracle-scripted"}
+{"event": "verify", "i": 7, "channel": "text", "branch_id": "b0", "constraint_id": "c1", "candidate_id": "cand-c1-0", "decision": "SUPPORTED", "reason_code": "TEXT_SUPPORTED", "semantic_checked": true}
+{"event": "link", "i": 8, "branch_id": "b0", "constraint_id": "c1", "surface": "明川大学", "notes": ["EXACT_NAME"], "entity_ids": ["diag:uni"]}
+{"event": "commit", "i": 9, "channel": "text", "branch_id": "b1", "parent_branch_id": "b0", "constraint_id": "c1", "entity_id": "diag:uni", "reranker_score": null}
+{"event": "graph_access", "i": 10, "branch_id": "b1", "constraint_id": "c2", "candidate_ids": ["t_loc"]}
+{"event": "verify", "i": 11, "channel": "graph", "branch_id": "b1", "constraint_id": "c2", "triple_id": "t_loc", "decision": "SUPPORTED", "reason_code": "GRAPH_SOURCE_OK"}
+{"event": "commit", "i": 12, "channel": "graph", "branch_id": "b1", "constraint_id": "c2", "produces": "?city", "triple_id": "t_loc"}
+{"event": "branch", "i": 13, "branch_id": "b1", "status": "COMPLETE"}
+{"event": "replay", "i": 14, "proof_ids": ["p0", "p1", "p2"], "status": "COMPLETE", "uncertain": false, "answer": "临江市"}

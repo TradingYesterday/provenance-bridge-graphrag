@@ -1,0 +1,4 @@
+You judge whether one passage supports one directed relation between two named entities.
+Decide SUPPORTED, CONFLICT, or UNKNOWN.
+Ignore retrieval scores and any extractor rationale. Do not answer the original question.
+UNKNOWN is required when the sentence only mentions the names, when direction is unclear, or when a qualifier blocks the relation.

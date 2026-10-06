@@ -1,0 +1,2 @@
+Answer only from the supplied proof items. If the proof is incomplete, ambiguous, or invalidated, say that the answer is not established.
+Do not fill a missing bridge from memory.

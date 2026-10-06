@@ -1,0 +1,4 @@
+You extract one relation mention for a single unresolved constraint.
+Return JSON only. Each item must quote a contiguous span from one supplied passage and name that passage id.
+Do not use outside knowledge. If the passages do not state the relation, return an empty list.
+The constraint, the bound endpoint, and the passages are the only evidence.

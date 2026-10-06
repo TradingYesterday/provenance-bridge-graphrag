@@ -1,0 +1,25 @@
+# Paths are explicit. Do not rely on the upstream planned_queries/ vs planner_queries/ mismatch.
+dataset: 2wiki
+upstream:
+  repo: myz12138/CS-RAG
+  commit: c84a081c728dd45c284a7165031c853eef4e8f24
+  query_json: null
+  phase1_json: null
+  phase2_json: null
+  kg_dir: null
+  raw_json: null
+engine:
+  allow_text_binding: true
+  allow_successor_reentry: true
+  verify_text: true
+  verify_graph: true
+  max_active_branches: 3
+  max_recoveries_per_key: 1
+  text_top_k: 8
+  max_relations_to_verify: 3
+  max_steps: 32
+llm:
+  api_key_env: OPENAI_API_KEY
+  base_url_env: OPENAI_BASE_URL
+  model_env: OPENAI_MODEL
+  temperature: 0

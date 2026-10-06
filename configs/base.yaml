@@ -1,0 +1,25 @@
+seed: 0
+dataset: 2wiki
+engine:
+  allow_text_binding: true
+  allow_successor_reentry: true
+  verify_text: true
+  verify_graph: true
+  max_active_branches: 3
+  max_recoveries_per_key: 1
+  text_top_k: 8
+  max_relations_to_verify: 3
+  max_link_candidates: 3
+  max_steps: 32
+  verifier_model: programmatic-v1
+  prompt_hash: programmatic-v1
+llm:
+  api_key_env: OPENAI_API_KEY
+  base_url_env: OPENAI_BASE_URL
+  model_env: OPENAI_MODEL
+  temperature: 0
+retrieval:
+  embedding_model: sentence-transformers/all-MiniLM-L6-v2
+  reranker_model: BAAI/bge-reranker-v2-m3
+  device: cpu
+  note: deterministic-lexical-v1 is the batch-1 stand-in, not the upstream cross-encoder

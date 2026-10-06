@@ -1,0 +1,207 @@
+{
+  "n": 20,
+  "ok": true,
+  "source": "synthetic_not_2wiki",
+  "rows": [
+    {
+      "question_id": "q0",
+      "ok": true,
+      "gold_leaked": false,
+      "kg_triple_id": "1",
+      "expected_kg_triple_id": "1",
+      "phase1_candidates_are_bindings": false,
+      "hard_failures": [],
+      "ambiguities": []
+    },
+    {
+      "question_id": "q1",
+      "ok": true,
+      "gold_leaked": false,
+      "kg_triple_id": "3",
+      "expected_kg_triple_id": "3",
+      "phase1_candidates_are_bindings": false,
+      "hard_failures": [],
+      "ambiguities": []
+    },
+    {
+      "question_id": "q2",
+      "ok": true,
+      "gold_leaked": false,
+      "kg_triple_id": "5",
+      "expected_kg_triple_id": "5",
+      "phase1_candidates_are_bindings": false,
+      "hard_failures": [],
+      "ambiguities": []
+    },
+    {
+      "question_id": "q3",
+      "ok": true,
+      "gold_leaked": false,
+      "kg_triple_id": "7",
+      "expected_kg_triple_id": "7",
+      "phase1_candidates_are_bindings": false,
+      "hard_failures": [],
+      "ambiguities": []
+    },
+    {
+      "question_id": "q4",
+      "ok": true,
+      "gold_leaked": false,
+      "kg_triple_id": "9",
+      "expected_kg_triple_id": "9",
+      "phase1_candidates_are_bindings": false,
+      "hard_failures": [],
+      "ambiguities": []
+    },
+    {
+      "question_id": "q5",
+      "ok": true,
+      "gold_leaked": false,
+      "kg_triple_id": "11",
+      "expected_kg_triple_id": "11",
+      "phase1_candidates_are_bindings": false,
+      "hard_failures": [],
+      "ambiguities": []
+    },
+    {
+      "question_id": "q6",
+      "ok": true,
+      "gold_leaked": false,
+      "kg_triple_id": "13",
+      "expected_kg_triple_id": "13",
+      "phase1_candidates_are_bindings": false,
+      "hard_failures": [],
+      "ambiguities": []
+    },
+    {
+      "question_id": "q7",
+      "ok": true,
+      "gold_leaked": false,
+      "kg_triple_id": "15",
+      "expected_kg_triple_id": "15",
+      "phase1_candidates_are_bindings": false,
+      "hard_failures": [],
+      "ambiguities": []
+    },
+    {
+      "question_id": "q8",
+      "ok": true,
+      "gold_leaked": false,
+      "kg_triple_id": "17",
+      "expected_kg_triple_id": "17",
+      "phase1_candidates_are_bindings": false,
+      "hard_failures": [],
+      "ambiguities": []
+    },
+    {
+      "question_id": "q9",
+      "ok": true,
+      "gold_leaked": false,
+      "kg_triple_id": "19",
+      "expected_kg_triple_id": "19",
+      "phase1_candidates_are_bindings": false,
+      "hard_failures": [],
+      "ambiguities": []
+    },
+    {
+      "question_id": "q10",
+      "ok": true,
+      "gold_leaked": false,
+      "kg_triple_id": "21",
+      "expected_kg_triple_id": "21",
+      "phase1_candidates_are_bindings": false,
+      "hard_failures": [],
+      "ambiguities": []
+    },
+    {
+      "question_id": "q11",
+      "ok": true,
+      "gold_leaked": false,
+      "kg_triple_id": "23",
+      "expected_kg_triple_id": "23",
+      "phase1_candidates_are_bindings": false,
+      "hard_failures": [],
+      "ambiguities": []
+    },
+    {
+      "question_id": "q12",
+      "ok": true,
+      "gold_leaked": false,
+      "kg_triple_id": "25",
+      "expected_kg_triple_id": "25",
+      "phase1_candidates_are_bindings": false,
+      "hard_failures": [],
+      "ambiguities": []
+    },
+    {
+      "question_id": "q13",
+      "ok": true,
+      "gold_leaked": false,
+      "kg_triple_id": "27",
+      "expected_kg_triple_id": "27",
+      "phase1_candidates_are_bindings": false,
+      "hard_failures": [],
+      "ambiguities": []
+    },
+    {
+      "question_id": "q14",
+      "ok": true,
+      "gold_leaked": false,
+      "kg_triple_id": "29",
+      "expected_kg_triple_id": "29",
+      "phase1_candidates_are_bindings": false,
+      "hard_failures": [],
+      "ambiguities": []
+    },
+    {
+      "question_id": "q15",
+      "ok": true,
+      "gold_leaked": false,
+      "kg_triple_id": "31",
+      "expected_kg_triple_id": "31",
+      "phase1_candidates_are_bindings": false,
+      "hard_failures": [],
+      "ambiguities": []
+    },
+    {
+      "question_id": "q16",
+      "ok": true,
+      "gold_leaked": false,
+      "kg_triple_id": "33",
+      "expected_kg_triple_id": "33",
+      "phase1_candidates_are_bindings": false,
+      "hard_failures": [],
+      "ambiguities": []
+    },
+    {
+      "question_id": "q17",
+      "ok": true,
+      "gold_leaked": false,
+      "kg_triple_id": "35",
+      "expected_kg_triple_id": "35",
+      "phase1_candidates_are_bindings": false,
+      "hard_failures": [],
+      "ambiguities": []
+    },
+    {
+      "question_id": "q18",
+      "ok": true,
+      "gold_leaked": false,
+      "kg_triple_id": "37",
+      "expected_kg_triple_id": "37",
+      "phase1_candidates_are_bindings": false,
+      "hard_failures": [],
+      "ambiguities": []
+    },
+    {
+      "question_id": "q19",
+      "ok": true,
+      "gold_leaked": false,
+      "kg_triple_id": "39",
+      "expected_kg_triple_id": "39",
+      "phase1_candidates_are_bindings": false,
+      "hard_failures": [],
+      "ambiguities": []
+    }
+  ]
+}

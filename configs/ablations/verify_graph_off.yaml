@@ -1,0 +1,5 @@
+engine:
+  allow_text_binding: true
+  allow_successor_reentry: true
+  verify_text: true
+  verify_graph: false
